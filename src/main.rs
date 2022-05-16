@@ -1,16 +1,23 @@
-// use ipfs_api::{IpfsApi, IpfsClient};
-use std::{fs::File, time};
+use std::path::PathBuf;
 
-use ipfs_api_backend_actix::{IpfsClient, IpfsApi, Error, response::AddResponse};
-
-use web3::contract::{Contract, Options};
+use clap::Parser;
 
 mod ipfs_interactions;
 mod eth_interactions;
 
+#[derive(Parser, Debug)]
+#[clap(author, version, about, long_about = None)]
+struct Cli {
+
+    #[clap(long, parse(from_os_str))]
+    file_path: PathBuf,
+}
+
 #[actix_rt::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let file_cid = ipfs_interactions::upload_file().await?;
+    let args = Cli::parse();
+
+    let file_cid = ipfs_interactions::upload_file(args.file_path).await?;
     eth_interactions::deploy_contract(file_cid).await?;
     Ok(())
 }

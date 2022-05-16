@@ -1,10 +1,10 @@
-use std::fs::File;
+use std::{fs::File, path::PathBuf};
 
 use ipfs_api_backend_actix::{IpfsClient, IpfsApi, Error, response::AddResponse};
 
-pub async fn upload_file() -> Result<String, Error> {
+pub async fn upload_file(path: PathBuf) -> Result<String, Error> {
     let client = IpfsClient::default();
-    let file = File::open("./file.json").expect("could not read source file");
+    let file = File::open(path).expect("could not read source file");
 
     let AddResponse {name, ..} = client.add(file).await?;
     Ok(name)
